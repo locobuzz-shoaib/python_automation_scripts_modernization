@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kafka Consumer Lag Report</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kafka Consumer Lag Report</h1>
+
+    <table id="lag_table">
+        <thead>
+            <tr>
+                <th>Partition</th>
+                <th>Committed Offset</th>
+                <th>Latest Offset</th>
+                <th>Lag</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- This section will be populated dynamically via WebSocket -->
+        </tbody>
+    </table>
+
+    <script>
+        const websocket = new WebSocket("ws://localhost:8765");
+
+        websocket.onopen = function() {
+            const request = {
+                group_id: 'FinalData',  // Replace with your consumer group ID
+                topic_name: 'gender_consumer_group'     // Replace with your topic name
+            };
+            websocket.send(JSON.stringify(request));
+        };
+
+        websocket.onmessage = function(event) {
+            const lagInfo = JSON.parse(event.data);
+            const tableBody = document.querySelector("#lag_table tbody");
+            tableBody.innerHTML = '';  // Clear existing rows
+
+            lagInfo.forEach(info => {
+                const row = document.createElement("tr");
+
+                const partitionCell = document.createElement("td");
+                partitionCell.textContent = info.partition;
+                row.appendChild(partitionCell);
+
+                const committedOffsetCell = document.createElement("td");
+                committedOffsetCell.textContent = info.committed_offset;
+                row.appendChild(committedOffsetCell);
+
+                const latestOffsetCell = document.createElement("td");
+                latestOffsetCell.textContent = info.latest_offset;
+                row.appendChild(latestOffsetCell);
+
+                const lagCell = document.createElement("td");
+                lagCell.textContent = info.lag;
+                row.appendChild(lagCell);
+
+                tableBody.appendChild(row);
+            });
+        };
+
+        websocket.onclose = function() {
+            console.log("WebSocket connection closed");
+        };
+
+        websocket.onerror = function(error) {
+            console.error("WebSocket error:", error);
+            websocket.close();
+        };
+    </script>
+</body>
+</html>
