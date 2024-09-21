@@ -1,6 +1,8 @@
+from io import BytesIO
+
 import requests
 from PIL import Image
-from io import BytesIO
+
 
 # Function to fetch an avatar from the Multiavatar API based on the name
 def get_avatar(name):
