@@ -15,20 +15,22 @@ def main():
     # Setup
     selected_theme = setup_db()
     root = tk.Tk()
-    style = Style(theme=selected_theme)
-    root.geometry("600x700")
+    style = Style(theme=selected_theme)  # Modern theme selection using ttkbootstrap
+    root.geometry("800x800")
     root.title("Random Name Selector with Avatars")
 
     # Header label
     header_label = tk.Label(root, text="Random Name Selector", font=("Helvetica", 26, "bold"))
-    header_label.pack()
+    header_label.grid(row=0, column=0, columnspan=2, pady=20)
 
-    # Entry and Add button
+    # Frame for name entry and buttons
     frame = tk.Frame(root)
-    frame.pack(pady=20)
+    frame.grid(row=1, column=0, columnspan=2, pady=20)
 
+    entry_label = tk.Label(frame, text="Enter Name:")
+    entry_label.grid(row=0, column=0, padx=10)
     entry = tk.Entry(frame, font=("Helvetica", 14))
-    entry.grid(row=0, column=0, padx=10, pady=10)
+    entry.grid(row=0, column=1, padx=10, pady=10)
 
     def add_person():
         person = entry.get()
@@ -49,11 +51,11 @@ def main():
             messagebox.showwarning("Duplicate Name", "This name is already in the list.")
 
     add_button = tk.Button(frame, text="Add Person", command=add_person)
-    add_button.grid(row=0, column=1, padx=10, pady=10)
+    add_button.grid(row=0, column=2, padx=10, pady=10)
 
-    # People listbox
+    # People listbox and avatars
     people_listbox = tk.Listbox(root, height=10, width=50, font=("Helvetica", 14))
-    people_listbox.pack(pady=10)
+    people_listbox.grid(row=2, column=0, columnspan=2, pady=10)
 
     # Load saved names
     saved_names = load_saved_names()
@@ -62,7 +64,7 @@ def main():
 
     # Shayari label
     shayari_label = tk.Label(root, text="", font=("Helvetica", 18, "italic"), wraplength=500, justify="center")
-    shayari_label.pack()
+    shayari_label.grid(row=3, column=0, columnspan=2, pady=10)
 
     # Theme selection using Combobox
     theme_var = tk.StringVar(value=selected_theme)
@@ -73,16 +75,16 @@ def main():
 
     theme_options = ['cyborg', 'darkly', 'superhero', 'flatly', 'journal']
     theme_menu = Combobox(root, textvariable=theme_var, values=theme_options, state="readonly")  # Use Combobox
-    theme_menu.pack(pady=10)
+    theme_menu.grid(row=4, column=0, columnspan=2, pady=10)
     theme_menu.bind("<<ComboboxSelected>>", on_theme_change)
 
     # Selected name label
     selected_label = tk.Label(root, text="", font=("Helvetica", 30, "bold"))
-    selected_label.pack(pady=20)
+    selected_label.grid(row=6, column=0, columnspan=2, pady=20)
 
     # Button frame for random selection and clearing the list
     button_frame = tk.Frame(root)
-    button_frame.pack(pady=20)
+    button_frame.grid(row=7, column=0, columnspan=2, pady=20)
 
     # Button to select a random person
     random_button = tk.Button(button_frame, text="Start Selection",
@@ -100,6 +102,15 @@ def main():
 
     clear_button = tk.Button(button_frame, text="Clear List", command=clear_list)
     clear_button.grid(row=0, column=1, padx=20, pady=10)
+
+    # Toggle Theme Button (for light/dark mode)
+    def toggle_theme():
+        current_theme = style.theme_use()
+        new_theme = 'flatly' if current_theme == 'darkly' else 'darkly'
+        style.theme_use(new_theme)
+
+    toggle_button = tk.Button(root, text="Toggle Light/Dark Mode", command=toggle_theme)
+    toggle_button.grid(row=8, column=0, columnspan=2, pady=20)
 
     # Start the Tkinter loop
     root.mainloop()
